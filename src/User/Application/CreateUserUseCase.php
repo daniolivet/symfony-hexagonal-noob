@@ -4,6 +4,7 @@ namespace App\User\Application;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /* Domain */
@@ -19,7 +20,6 @@ use App\User\Application\DTO\ValueObjects\Email;
 use App\User\Application\DTO\ValueObjects\Name;
 use App\User\Application\DTO\ValueObjects\Password;
 use App\User\Application\DTO\ValueObjects\Surnames;
-use Symfony\Component\HttpFoundation\Response;
 
 final class CreateUserUseCase {
 

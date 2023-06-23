@@ -13,4 +13,6 @@ interface IUserRepository {
 
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void;
 
+    public function findByEmail( string $email );
+
 }
