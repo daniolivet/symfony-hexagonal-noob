@@ -17,14 +17,22 @@ final class CreateUserController extends AbstractController {
     ) {}
 
     /**
-     * @param Request $request
+     * @param  Request        $request
      * @return JsonResponse
      */
-    public function __invoke( Request $request ): JsonResponse {
+    public function __invoke( Request $request ): JsonResponse{
 
         $requestData = json_decode( $request->getContent(), true );
 
         $createUser = ( $this->useCase )( $requestData );
+
+        if ( isset( $createUser['errors'] ) ) {
+            return $this->json( [
+                'response' => $createUser['response'],
+                'message'  => $createUser['message'],
+                'errors'   => $createUser['errors'],
+            ], $createUser['code'] );
+        }
 
         return $this->json( [
             'response' => $createUser['response'],

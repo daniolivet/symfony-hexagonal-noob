@@ -6,7 +6,6 @@ use App\User\Application\DTO\ValueObjects\Email;
 use App\User\Application\DTO\ValueObjects\Name;
 use App\User\Application\DTO\ValueObjects\Password;
 use App\User\Application\DTO\ValueObjects\Surnames;
-use App\User\Application\DTO\ValueObjects\Uuid;
 
 final class UserDto {
 
@@ -23,12 +22,13 @@ final class UserDto {
         private Email $email,
         private Name $name,
         private Surnames $surnames
-    ) {}
+    ) {
+    }
 
     /**
-     * 
+     *
      * Uuid getter
-     * 
+     *
      * @return string
      */
     public function getUuid(): string {
@@ -36,9 +36,9 @@ final class UserDto {
     }
 
     /**
-     * 
+     *
      * Password getter
-     * 
+     *
      * @return string
      */
     public function getPassword(): string {
@@ -46,9 +46,9 @@ final class UserDto {
     }
 
     /**
-     * 
+     *
      * Email getter
-     * 
+     *
      * @return mixed
      */
     public function getEmail(): string {
@@ -56,9 +56,9 @@ final class UserDto {
     }
 
     /**
-     * 
+     *
      * Name getter
-     * 
+     *
      * @return string
      */
     public function getName(): string {
@@ -66,15 +66,22 @@ final class UserDto {
     }
 
     /**
-     * 
+     *
      * Surnames getter
-     * 
+     *
      * @return string
      */
     public function getSurnames(): string {
         return $this->surnames->getValue();
     }
 
+    /**
+     * @param string   $uuid
+     * @param Password $password
+     * @param Email    $email
+     * @param Name     $name
+     * @param Surnames $surnames
+     */
     public static function create(
         string $uuid,
         Password $password,

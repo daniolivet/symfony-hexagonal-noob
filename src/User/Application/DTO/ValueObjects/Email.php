@@ -3,7 +3,6 @@
 namespace App\User\Application\DTO\ValueObjects;
 
 use App\User\Domain\Repository\IUserRepository;
-use App\User\Application\DTO\Exception\InvalidFormatEmail;
 use App\User\Application\DTO\Exception\UserExists;
 
 final class Email {
@@ -17,7 +16,6 @@ final class Email {
         string $email, 
         private readonly IUserRepository $repository 
     ) {
-        $this->ensureIsValid( $email );
         $this->ensureIfExists( $email );
         $this->value = $email;
     }
@@ -32,23 +30,13 @@ final class Email {
     }
 
     /**
-     * Validate email format. Return a exception if not is valid.
+     * Ensure if an user already exists
      *
-     * @param string $password
-     * @throws InvalidFormatEmail
+     * @param string $email
+     * @throws UserExists
      * @return void
      */
-    private function ensureIsValid( string $email ): void {
-        $regex = "/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/";
-
-        if ( !preg_match( $regex, $email ) ) {
-            throw new InvalidFormatEmail(
-                "The email {$email} does not have a valid format."
-            );
-        }
-    }
-
-    private function ensureIfExists( string $email ) {
+    private function ensureIfExists( string $email ): void {
         $exist = $this->repository->findByEmail($email);
         
         if( count($exist) !== 0 ) {
