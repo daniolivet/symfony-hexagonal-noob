@@ -13,7 +13,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Id]
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $uuid = null;
+    private string $uuid;
 
     #[ORM\Column]
     private array $roles = [];

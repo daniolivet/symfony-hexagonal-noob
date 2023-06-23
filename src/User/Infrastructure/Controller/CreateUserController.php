@@ -3,9 +3,9 @@
 namespace App\User\Infrastructure\Controller;
 
 use App\User\Application\CreateUserUseCase;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CreateUserController extends AbstractController {
 
@@ -16,7 +16,7 @@ class CreateUserController extends AbstractController {
     public function __invoke(Request $request): JsonResponse
     {
 
-        $user = ($this->useCase)();
+        $createUser = ($this->useCase)($request);
 
         return new JsonResponse([
             'message' => 'Hello from MyController!',
