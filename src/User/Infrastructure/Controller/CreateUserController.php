@@ -7,20 +7,29 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class CreateUserController extends AbstractController {
+final class CreateUserController extends AbstractController {
 
+    /**
+     * @param CreateUserUseCase $useCase
+     */
     public function __construct(
         private readonly CreateUserUseCase $useCase
-    ){}
+    ) {}
 
-    public function __invoke(Request $request): JsonResponse
-    {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function __invoke( Request $request ): JsonResponse {
 
-        $createUser = ($this->useCase)($request);
+        $requestData = json_decode( $request->getContent(), true );
 
-        return new JsonResponse([
-            'message' => 'Hello from MyController!',
-        ]);
+        $createUser = ( $this->useCase )( $requestData );
+
+        return $this->json( [
+            'response' => $createUser['response'],
+            'message'  => $createUser['message'],
+        ], $createUser['code'] );
     }
 
 }

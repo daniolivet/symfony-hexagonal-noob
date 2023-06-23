@@ -33,6 +33,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private string $surnames;
 
+
+    public function __construct(
+        string $uuid,
+        string $password,
+        string $email,
+        string $name,
+        string $surnames
+    )
+    {
+        $this->setUuid($uuid);
+        $this->setPassword($password);
+        $this->setEmail($email);
+        $this->setName($name);
+        $this->setSurnames($surnames);
+    }
+
     public function getUuid(): ?string
     {
         return $this->uuid;

@@ -2,6 +2,7 @@
 
 namespace App\User\Application\DTO\ValueObjects;
 
+use App\User\Domain\Repository\IUserRepository;
 use App\User\Application\DTO\Exception\InvalidFormatEmail;
 
 final class Email {
@@ -11,7 +12,10 @@ final class Email {
     /**
      * @param string $email
      */
-    public function __construct( string $email ) {
+    public function __construct( 
+        string $email, 
+        private readonly IUserRepository $repository 
+    ) {
         $this->ensureIsValid( $email );
         $this->value = $email;
     }
