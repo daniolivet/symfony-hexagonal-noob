@@ -20,10 +20,9 @@ class UserRepositoryTest extends DoctrineTestCase {
         $user       = $this->makeUser();
 
         $repository->save( $user, true );
-
-        
-
         $this->clearUnitOfWork();
+
+        $this->assertTrue( $repository->exists($user->getUuid()) );
     }
 
     /**
@@ -62,9 +61,9 @@ class UserRepositoryTest extends DoctrineTestCase {
 
     /**
      * @param User $user
-     * @return mixed
+     * @return UserRepository
      */
-    private function repositoryWithUser( User $user ) {
+    private function repositoryWithUser( User $user ): UserRepository {
         /**
          * @var UserRepository $repository
          */
@@ -76,6 +75,13 @@ class UserRepositoryTest extends DoctrineTestCase {
         return $repository;
     }
 
+    /**
+     * Check if two properties is equals to
+     *
+     * @param string $property_one
+     * @param string $property_two
+     * @return boolean
+     */
     private function equalsTo(string $property_one, string $property_two ): bool {
         return $property_one === $property_two;
     }

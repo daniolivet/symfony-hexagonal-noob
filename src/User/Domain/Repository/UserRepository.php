@@ -89,4 +89,40 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $queryResponse->getOneOrNullResult();
     }
 
+    /**
+     * Find an user by Uuid
+     *
+     * @param string $uuid
+     * @return User|null
+     */
+    public function findByUuid( string $uuid ): ?User {
+        $criteria = Criteria::create();
+
+        $criteria->where(
+            Criteria::expr()->eq( 'uuid', $uuid )
+        );
+        $criteria->setMaxResults( 1 );
+
+        $query = $this->getEntityManager()->createQueryBuilder();
+        $query
+            ->select( 'u' )
+            ->from( User::class, 'u' )
+            ->addCriteria( $criteria );
+
+        $queryResponse = $query->getQuery();
+        return $queryResponse->getOneOrNullResult();
+    }
+
+    /**
+     * Check if exists an user
+     *
+     * @param string $uuid
+     * @return bool
+     */
+    public function exists( string $uuid ): bool {
+        $user = $this->findByUuid($uuid);
+
+        return null !== $user;
+    }
+
 }
