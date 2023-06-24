@@ -39,7 +39,7 @@ final class Email {
     private function ensureIfExists( string $email ): void {
         $exist = $this->repository->findByEmail($email);
         
-        if( count($exist) !== 0 ) {
+        if( null === $exist ) {
             throw new UserExists("The user with email {$email} already exists.");
         }
     }

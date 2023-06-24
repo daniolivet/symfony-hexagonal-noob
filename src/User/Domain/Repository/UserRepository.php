@@ -68,9 +68,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * Find an user by email
      * 
      * @param string $email
-     * @return array
+     * @return User|null
      */
-    public function findByEmail( string $email ): array {
+    public function findByEmail( string $email ): ?User {
 
         $criteria = Criteria::create();
 
@@ -86,7 +86,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->addCriteria( $criteria );
 
         $queryResponse = $query->getQuery();
-        return $queryResponse->getResult();
+        return $queryResponse->getOneOrNullResult();
     }
 
 }
