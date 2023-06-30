@@ -39,7 +39,12 @@ final class CreateUserUseCaseTest extends TestCase {
     public function itShouldReturnValidateErrors() {
 
         // Arrage
-        $requestData = $this->makeRequestData();
+        $requestData = $this->makeRequestData( [
+            'password' => 'Malaga1997//',
+            'email'    => 'dani',
+            'name'     => 'Dani',
+            'surnames' => 'Olivet Jiménez',
+        ] );
 
         $violations = $this->makeViolationList( [
             'message' => 'Invalid email',
@@ -62,7 +67,7 @@ final class CreateUserUseCaseTest extends TestCase {
             ->method( 'validate' )
             ->willReturn( $violations );
 
-        // Act    
+        // Act
         $createUser = ( $this->createUseCaseClass )( $requestData );
 
         // Assert
@@ -74,25 +79,59 @@ final class CreateUserUseCaseTest extends TestCase {
     }
 
     /**
+     * @test
+     */
+    public function itShouldCreateAnUser() {
+        // Arrage
+        $requestData = $this->makeRequestData( [
+            'password' => 'Malaga1997//',
+            'email'    => 'dani12@gmail.com',
+            'name'     => 'Dani',
+            'surnames' => 'Olivet Jiménez',
+        ] );
+
+        $responseExpected = [
+            'response' => true,
+            'code'     => Response::HTTP_OK,
+            'message'  => 'User created succesfully!',
+        ];   
+
+        $this->validator
+            ->expects( self::exactly( 1 ) )
+            ->method( 'validate' )
+            ->willReturn( [] );
+
+        // Act
+        $createUser = ( $this->createUseCaseClass )( $requestData );
+
+        // Assert
+        $this->assertEquals(
+            $responseExpected,
+            $createUser,
+            'Error should be equals to expected.'
+        );
+    }
+
+    /**
      * Make a mock of Request data
      *
      * @return array
      */
-    private function makeRequestData(): array{
+    private function makeRequestData( array $data ): array{
         return [
-            'password' => 'Dani1234//',
-            'email'    => 'dani',
-            'name'     => 'Dani',
-            'surnames' => 'Olivet Jimenez',
+            'password' => $data['password'],
+            'email'    => $data['email'],
+            'name'     => $data['name'],
+            'surnames' => $data['surnames'],
         ];
     }
 
     /**
      * Make a mock of ViolationList
-     * 
+     *
      * @param array $violationData
      */
-    private function makeViolationList( array $violationData ): ConstraintViolationList {
+    private function makeViolationList( array $violationData ): ConstraintViolationList{
         $mockViolationList = new ConstraintViolation(
             $violationData['message'],
             null,

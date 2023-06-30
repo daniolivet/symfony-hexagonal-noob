@@ -14,6 +14,7 @@ use App\User\Domain\Repository\IUserRepository;
 /* DTO */
 use App\User\Application\DTO\UserDto;
 use App\User\Application\DTO\UserValidator;
+
 /* Value Objects */
 use App\User\Application\DTO\ValueObjects\Uuid;
 use App\User\Application\DTO\ValueObjects\Email;
