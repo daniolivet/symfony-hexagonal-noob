@@ -86,37 +86,6 @@ final class CreateUserUseCaseTest extends TestCase {
     /**
      * @test
      */
-    public function itShouldCreateAnUser() {
-        // Arrage
-        $requestData = $this->makeRequestData( [
-            'password' => 'Malaga1997//',
-            'email'    => 'dani12@gmail.com',
-            'name'     => 'Dani',
-            'surnames' => 'Olivet Jiménez',
-        ] );
-
-        $responseExpected = [
-            'response' => true,
-            'code'     => Response::HTTP_OK,
-            'message'  => 'User created succesfully!',
-        ];
-
-        $this->makeValidatorWithoutErrors();
-
-        // Act
-        $createUser = ( $this->createUseCaseClass )( $requestData );
-
-        // Assert
-        $this->assertEquals(
-            $responseExpected,
-            $createUser,
-            self::ASSERT_ERROR
-        );
-    }
-
-    /**
-     * @test
-     */
     public function itShouldReturnErrorInPasswordField() {
         // Arrage
         $requestData = $this->makeRequestData( [
@@ -208,6 +177,37 @@ final class CreateUserUseCaseTest extends TestCase {
         // Assert
         $this->assertEquals(
             $errorExpected,
+            $createUser,
+            self::ASSERT_ERROR
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldCreateAnUser() {
+        // Arrage
+        $requestData = $this->makeRequestData( [
+            'password' => 'Malaga1997//',
+            'email'    => 'dani12@gmail.com',
+            'name'     => 'Dani',
+            'surnames' => 'Olivet Jiménez',
+        ] );
+
+        $responseExpected = [
+            'response' => true,
+            'code'     => Response::HTTP_OK,
+            'message'  => 'User created succesfully!',
+        ];
+
+        $this->makeValidatorWithoutErrors();
+
+        // Act
+        $createUser = ( $this->createUseCaseClass )( $requestData );
+
+        // Assert
+        $this->assertEquals(
+            $responseExpected,
             $createUser,
             self::ASSERT_ERROR
         );
