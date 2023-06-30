@@ -128,6 +128,35 @@ final class RegisterUserTest extends WebTestCase {
     }
 
     /**
+     * @test
+     */
+    public function itShouldReturnErrorPasswordInvalid() {
+
+        // Arrage
+        $responseExpected = [
+            "response" => false,
+            "message"  => "The password must have 8 characters, lowercase, uppercase, numbers and special characters."
+        ];
+
+        // Act
+        $this->makeRequest( [
+            "email"    => "dani@gmail.com",
+            "name"     => "Dani",
+            "surnames" => "Olivet",
+            "password" => "1234//",
+        ] );
+
+        // Assert
+        $response = json_decode( self::$client->getResponse()->getContent(), true );
+
+        $this->makeAsserts(
+            Response::HTTP_BAD_REQUEST,
+            $response,
+            $responseExpected
+        );
+    }
+
+    /**
      * @param array $body
      */
     private function makeRequest( array $body ): void{
