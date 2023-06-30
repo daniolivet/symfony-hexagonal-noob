@@ -10,6 +10,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 final class RegisterUserTest extends WebTestCase {
 
     private const VALIDATE_EMPTY_ERROR = 'This value should not be blank.';
+    private const USER_DATA            = [
+        "email"    => "dani12@gmail.com",
+        "name"     => "Dani",
+        "surnames" => "Olivet Jimenez",
+        "password" => "Malaga1997//",
+    ];
 
     /**
      * @var KernelBrowser
@@ -21,8 +27,7 @@ final class RegisterUserTest extends WebTestCase {
      */
     private Connection $entityManager;
 
-    public static function setUpBeforeClass(): void
-    {
+    public static function setUpBeforeClass(): void{
         self::$client = static::createClient();
     }
 
@@ -48,12 +53,7 @@ final class RegisterUserTest extends WebTestCase {
         ];
 
         // Act
-        $this->makeRequest([
-            "email"    => "dani12@gmail.com",
-            "name"     => "Dani",
-            "surnames" => "Olivet Jimenez",
-            "password" => "Malaga1997//",
-        ]);
+        $this->makeRequest( self::USER_DATA );
 
         // Assert
         $response = json_decode( self::$client->getResponse()->getContent(), true );
@@ -64,6 +64,32 @@ final class RegisterUserTest extends WebTestCase {
             $responseExpected
         );
 
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldReturnErrorEmailExists() {
+
+        // Arrage
+        $responseExpected = [
+            "response" => false,
+            "message"  => "The user with email dani12@gmail.com already exists.",
+        ];
+
+        $this->makeRequest( self::USER_DATA );
+
+        // Act
+        $this->makeRequest( self::USER_DATA );
+
+        // Assert
+        $response = json_decode( self::$client->getResponse()->getContent(), true );
+
+        $this->makeAsserts(
+            Response::HTTP_BAD_REQUEST,
+            $response,
+            $responseExpected
+        );
     }
 
     /**
@@ -84,12 +110,12 @@ final class RegisterUserTest extends WebTestCase {
         ];
 
         // Act
-        $this->makeRequest([
+        $this->makeRequest( [
             "email"    => "",
             "name"     => "",
             "surnames" => "",
             "password" => "",
-        ]);
+        ] );
 
         // Assert
         $response = json_decode( self::$client->getResponse()->getContent(), true );
@@ -101,7 +127,10 @@ final class RegisterUserTest extends WebTestCase {
         );
     }
 
-    private function makeRequest( array $body ): void {
+    /**
+     * @param array $body
+     */
+    private function makeRequest( array $body ): void{
         self::$client->request(
             'POST',
             '/user/create',
@@ -114,7 +143,13 @@ final class RegisterUserTest extends WebTestCase {
         );
     }
 
-    private function makeAsserts( int $statusCode, array $response, array $responseExpected ): void {
+    /**
+     * @param  int    $statusCode
+     * @param  array  $response
+     * @param  array  $responseExpected
+     * @return void
+     */
+    private function makeAsserts( int $statusCode, array $response, array $responseExpected ): void{
         $this->assertEquals(
             $statusCode,
             self::$client->getResponse()->getStatusCode(),
