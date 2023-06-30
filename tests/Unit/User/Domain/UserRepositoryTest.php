@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\User\Domain;
+namespace App\Tests\Unit\User\Domain;
 
 use App\Tests\DoctrineTestCase;
 use App\User\Application\DTO\ValueObjects\Uuid;
@@ -14,14 +14,17 @@ class UserRepositoryTest extends DoctrineTestCase {
      */
     public function itShouldSaveAUser(): void{
         /**
+         * Arrage
          * @var UserRepository $repository
          */
         $repository = $this->getContainer()->get( UserRepository::class );
         $user       = $this->makeUser();
 
+        // Act
         $repository->save( $user, true );
         $this->clearUnitOfWork();
 
+        // Assert
         $this->assertTrue( $repository->exists($user->getUuid()) );
     }
 
@@ -29,11 +32,14 @@ class UserRepositoryTest extends DoctrineTestCase {
      * @test
      */
     public function itShouldFindAnUserByEmail(): void{
+        // Arrage
         $user       = $this->makeUser();
         $repository = $this->repositoryWithUser( $user );
 
+        // Act
         $foundUser = $repository->findByEmail( $user->getEmail() );
 
+        // Assert
         $this->assertTrue( $this->equalsTo( $foundUser->getUuid(), $user->getUuid() ) );
         $this->assertTrue( $this->equalsTo( $foundUser->getEmail(), $user->getEmail() ) );
         $this->assertTrue( $this->equalsTo( $foundUser->getName(), $user->getName() ) );

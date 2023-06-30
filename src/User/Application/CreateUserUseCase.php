@@ -30,9 +30,7 @@ final class CreateUserUseCase {
      * @param UuidFactory                 $uuid
      */
     public function __construct(
-        private readonly UserPasswordHasherInterface $pwdHasher,
         private readonly IUserRepository $repository,
-        private readonly UuidFactory $uuid,
         private readonly ValidatorInterface $validator
     ) {}
 
