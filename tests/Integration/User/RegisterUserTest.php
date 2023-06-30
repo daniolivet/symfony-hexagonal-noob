@@ -9,23 +9,29 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class RegisterUserTest extends WebTestCase {
 
+    private const VALIDATE_EMPTY_ERROR = 'This value should not be blank.';
+
     /**
      * @var KernelBrowser
      */
-    private KernelBrowser $client;
+    private static KernelBrowser $client;
 
     /**
      * @var Connection
      */
     private Connection $entityManager;
 
-    protected function setUp(): void {
-        $this->client        = static::createClient();
+    public static function setUpBeforeClass(): void
+    {
+        self::$client = static::createClient();
+    }
+
+    protected function setUp(): void{
         $this->entityManager = $this->getContainer()->get( Connection::class );
         $this->entityManager->beginTransaction();
     }
 
-    protected function tearDown(): void {
+    protected function tearDown(): void{
         $this->clearDatabase();
         $this->entityManager->close();
     }
@@ -42,7 +48,61 @@ final class RegisterUserTest extends WebTestCase {
         ];
 
         // Act
-        $this->client->request(
+        $this->makeRequest([
+            "email"    => "dani12@gmail.com",
+            "name"     => "Dani",
+            "surnames" => "Olivet Jimenez",
+            "password" => "Malaga1997//",
+        ]);
+
+        // Assert
+        $response = json_decode( self::$client->getResponse()->getContent(), true );
+
+        $this->makeAsserts(
+            Response::HTTP_OK,
+            $response,
+            $responseExpected
+        );
+
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldReturnErrorWithEmptyData() {
+
+        // Arrage
+        $responseExpected = [
+            "response" => false,
+            "message"  => "There is errors in the request.",
+            "errors"   => [
+                "password" => self::VALIDATE_EMPTY_ERROR,
+                "email"    => self::VALIDATE_EMPTY_ERROR,
+                "name"     => self::VALIDATE_EMPTY_ERROR,
+                "surnames" => self::VALIDATE_EMPTY_ERROR,
+            ],
+        ];
+
+        // Act
+        $this->makeRequest([
+            "email"    => "",
+            "name"     => "",
+            "surnames" => "",
+            "password" => "",
+        ]);
+
+        // Assert
+        $response = json_decode( self::$client->getResponse()->getContent(), true );
+
+        $this->makeAsserts(
+            Response::HTTP_BAD_REQUEST,
+            $response,
+            $responseExpected
+        );
+    }
+
+    private function makeRequest( array $body ): void {
+        self::$client->request(
             'POST',
             '/user/create',
             [],
@@ -50,20 +110,14 @@ final class RegisterUserTest extends WebTestCase {
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            json_encode( [
-                "email"    => "dani12@gmail.com",
-                "name"     => "Dani",
-                "surnames" => "Olivet Jimenez",
-                "password" => "Malaga1997//",
-            ] )
+            json_encode( $body )
         );
+    }
 
-        // Assert
-        $response = json_decode($this->client->getResponse()->getContent(), true);
-
+    private function makeAsserts( int $statusCode, array $response, array $responseExpected ): void {
         $this->assertEquals(
-            Response::HTTP_OK,
-            $this->client->getResponse()->getStatusCode(),
+            $statusCode,
+            self::$client->getResponse()->getStatusCode(),
             'Http code should be equals to expected.'
         );
 
@@ -72,7 +126,6 @@ final class RegisterUserTest extends WebTestCase {
             $response,
             'Response should be equals to expected.'
         );
-
     }
 
     /**
@@ -80,8 +133,7 @@ final class RegisterUserTest extends WebTestCase {
      *
      * @return void
      */
-    protected function clearDatabase(): void
-    {
+    protected function clearDatabase(): void {
         foreach ( $this->entityManager->createSchemaManager()->listTableNames() as $tableName ) {
             $this->entityManager->executeQuery( 'TRUNCATE ' . $tableName );
         }
