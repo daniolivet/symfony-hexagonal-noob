@@ -21,7 +21,6 @@ final class CreateUserController extends AbstractController {
      * @return JsonResponse
      */
     public function __invoke( Request $request ): JsonResponse{
-
         $requestData = json_decode( $request->getContent(), true );
 
         $createUser = ( $this->useCase )( $requestData );

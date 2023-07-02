@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0.33
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Malaga1997//
+      MYSQL_DATABASE: noob_db
+      MYSQL_USER: daniel.olivet
+      MYSQL_PASSWORD: Malaga1997//
+    volumes:
+      - ./docker/db_data:/var/lib/mysql
+
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  db_data:
