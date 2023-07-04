@@ -6,6 +6,9 @@ use DateTimeImmutable;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class UserCreatedEvent extends Event {
+
+    public const NAME_EVENT = "user.created";
+
     protected string $uuid;
     protected DateTimeImmutable $ocurredOn;
 

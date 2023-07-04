@@ -67,7 +67,7 @@ final class CreateUserUseCase {
             $this->repository->save( $user, true );
 
             foreach( $user->pullDomainEvents() as $event ) {
-                $this->eventDispatcher->dispatch($event);
+                $this->eventDispatcher->dispatch($event, $event::NAME_EVENT);
             }
 
             return [
