@@ -2,14 +2,18 @@
 
 namespace App\User\Domain\Entity;
 
+use App\User\Domain\Events\UserCreatedEvent;
 use App\User\Domain\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
+    protected array $domainEvents = [];
 
     #[ORM\Id]
     #[ORM\Column(length: 180, unique: true)]
@@ -54,7 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): static
+    public function setUuid(string $uuid): self
     {
         $this->uuid = $uuid;
 
@@ -91,7 +95,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): static
+    public function setRoles(array $roles): self
     {
         $this->roles = $roles;
 
@@ -106,7 +110,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(string $password): self
     {
         $this->password = $password;
 
@@ -118,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
 
@@ -130,7 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -142,7 +146,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->surnames;
     }
 
-    public function setSurnames(string $surnames): static
+    public function setSurnames(string $surnames): self
     {
         $this->surnames = $surnames;
 
@@ -167,5 +171,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @param string   $uuid
+     * @param Password $password
+     * @param Email    $email
+     * @param Name     $name
+     * @param Surnames $surnames
+     */
+    public static function create(
+        string $uuid,
+        string $password,
+        string $email,
+        string $name,
+        string $surnames
+    ) {
+        $user = new self(
+            $uuid,
+            $password,
+            $email,
+            $name,
+            $surnames
+        );
+
+        $user->recordDomainEvent(
+            new UserCreatedEvent($user->getUuid())
+        ); 
+
+        return $user;
+    }
+
+    public function recordDomainEvent(Event $event): self
+    {
+        $this->domainEvents[] = $event;
+        return $this;
+    }
+    public function pullDomainEvents(): array
+    {
+        $domainEvents = $this->domainEvents;
+        $this->domainEvents = [];
+        return $domainEvents;
     }
 }

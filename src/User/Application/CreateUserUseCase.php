@@ -22,6 +22,7 @@ use App\User\Application\DTO\ValueObjects\Name;
 use App\User\Application\DTO\ValueObjects\Password;
 use App\User\Application\DTO\ValueObjects\Surnames;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class CreateUserUseCase {
 
@@ -32,7 +33,8 @@ final class CreateUserUseCase {
      */
     public function __construct(
         private readonly IUserRepository $repository,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {}
 
     /**
@@ -54,7 +56,7 @@ final class CreateUserUseCase {
 
             $userDto = $this->createUserDTO( $requestData );
 
-            $user = new User(
+            $user = User::create(
                 $userDto->getUuid(),
                 $userDto->getPassword(),
                 $userDto->getEmail(),
@@ -63,6 +65,10 @@ final class CreateUserUseCase {
             );
 
             $this->repository->save( $user, true );
+
+            foreach( $user->pullDomainEvents() as $event ) {
+                $this->eventDispatcher->dispatch($event);
+            }
 
             return [
                 'response' => true,
