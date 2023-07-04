@@ -9,6 +9,8 @@ services:
       MYSQL_DATABASE: noob_db
       MYSQL_USER: daniel.olivet
       MYSQL_PASSWORD: Malaga1997//
+    ports:
+      - 3307:3306
     volumes:
       - ./docker/db_data:/var/lib/mysql
 

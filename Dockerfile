@@ -19,17 +19,16 @@ RUN pecl install xdebug \
 
 COPY ./docker/apache/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
-
 # Composer install
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader && \
     chown -R www-data:www-data var
 
 # Symfony binary
 COPY ./docker/bin/symfony /usr/local/bin/symfony
-
-COPY . .
 
 WORKDIR /var/www/html
 
