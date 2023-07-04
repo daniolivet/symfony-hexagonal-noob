@@ -34,6 +34,7 @@ final class CreateUserUseCase {
     public function __construct(
         private readonly IUserRepository $repository,
         private readonly ValidatorInterface $validator,
+        private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EventDispatcherInterface $eventDispatcher
     ) {}
 
@@ -64,11 +65,11 @@ final class CreateUserUseCase {
                 $userDto->getSurnames()
             );
 
+            $this->hashUserPassword($user);
+
             $this->repository->save( $user, true );
 
-            foreach( $user->pullDomainEvents() as $event ) {
-                $this->eventDispatcher->dispatch($event, $event::NAME_EVENT);
-            }
+            $this->pullEvent($user);
 
             return [
                 'response' => true,
@@ -132,6 +133,33 @@ final class CreateUserUseCase {
         }
 
         return $requestErrors;
+    }
+
+    /**
+     * Hash user password
+     *
+     * @param User $user
+     * @return void
+     */
+    private function hashUserPassword( User $user ) {
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $user,
+            $user->getPassword()
+        );
+
+        $user->setPassword($hashedPassword);
+    }
+
+    /**
+     * Dispatch event
+     *
+     * @param User $user
+     * @return void
+     */
+    private function pullEvent( User $user ) {
+        foreach( $user->pullDomainEvents() as $event ) {
+            $this->eventDispatcher->dispatch($event, $event::NAME_EVENT);
+        }
     }
 
 }
