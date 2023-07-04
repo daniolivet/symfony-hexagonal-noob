@@ -24,11 +24,11 @@ services:
     # please note that last definitions always *replace* previous ones
 
     # Events Listeners
-    App\User\Domain\EventsListener\UserCreatedEventListener:
+    App\User\Application\EventsListener\UserCreatedEventListener:
         tags: 
             - {
                 name: kernel.event_listener,
-                event: 'App\User\Domain\Events\UserCreatedEvent'
+                event: 'App\User\Application\Events\UserCreatedEvent'
             }
 
     # Controllers

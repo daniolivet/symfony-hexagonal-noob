@@ -2,7 +2,7 @@
 
 namespace App\User\Domain\Entity;
 
-use App\User\Domain\Events\UserCreatedEvent;
+use App\User\Application\Events\UserCreatedEvent;
 use App\User\Domain\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -196,7 +196,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         );
 
         $user->recordDomainEvent(
-            new UserCreatedEvent($user->getUuid())
+            new UserCreatedEvent(
+                $user->getEmail()
+            )
         ); 
 
         return $user;
