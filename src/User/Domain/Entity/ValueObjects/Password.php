@@ -1,8 +1,8 @@
 <?php 
 
-namespace App\User\Application\DTO\ValueObjects;
+namespace App\User\Domain\Entity\ValueObjects;
 
-use App\User\Application\DTO\Exception\InvalidFormatPassword;
+use App\User\Domain\Exception\InvalidFormatPassword;
 
 final class Password {
 

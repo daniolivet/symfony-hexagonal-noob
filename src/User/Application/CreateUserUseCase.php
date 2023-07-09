@@ -3,33 +3,31 @@
 namespace App\User\Application;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\HttpFoundation\Response;
+use App\User\Application\Validate\UserValidator;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /* Domain */
 use App\User\Domain\Entity\User;
+use App\User\Domain\Entity\ValueObjects\Email;
+use App\User\Domain\Entity\ValueObjects\Name;
 use App\User\Domain\Repository\IUserRepository;
 
-/* DTO */
-use App\User\Application\DTO\UserDto;
-use App\User\Application\DTO\UserValidator;
-
 /* Value Objects */
-use App\User\Application\DTO\ValueObjects\Uuid;
-use App\User\Application\DTO\ValueObjects\Email;
-use App\User\Application\DTO\ValueObjects\Name;
-use App\User\Application\DTO\ValueObjects\Password;
-use App\User\Application\DTO\ValueObjects\Surnames;
+use App\User\Domain\Entity\ValueObjects\Password;
+use App\User\Domain\Entity\ValueObjects\Surnames;
+use App\User\Domain\Entity\ValueObjects\Uuid;
+
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class CreateUserUseCase {
 
     /**
-     * @param UserPasswordHasherInterface $pwdHasher
-     * @param IUserRepository             $repository
-     * @param UuidFactory                 $uuid
+     * @param IUserRepository $repository
+     * @param ValidatorInterface $validator
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         private readonly IUserRepository $repository,
@@ -55,21 +53,13 @@ final class CreateUserUseCase {
                 ];
             }
 
-            $userDto = $this->createUserDTO( $requestData );
+            $user = $this->createUser($requestData);
 
-            $user = User::create(
-                $userDto->getUuid(),
-                $userDto->getPassword(),
-                $userDto->getEmail(),
-                $userDto->getName(),
-                $userDto->getSurnames()
-            );
-
-            $this->hashUserPassword($user);
+            $this->hashUserPassword( $user );
 
             $this->repository->save( $user, true );
 
-            $this->pullEvent($user);
+            $this->pullEvent( $user );
 
             return [
                 'response' => true,
@@ -86,24 +76,16 @@ final class CreateUserUseCase {
 
     }
 
-    /**
-     * Create an user DTO
-     *
-     * @param  array       $requestData
-     * @throws Exception
-     * @return UserDto
-     */
-    private function createUserDTO( array $requestData ): UserDto {
-
-        return UserDto::create(
+    private function createUser( array $data ): User {
+        return User::create(
             Uuid::generate(),
-            new Password( $requestData['password'] ),
+            new Password( $data['password'] ),
             new Email(
-                $requestData['email'],
+                $data['email'],
                 $this->repository
             ),
-            new Name( $requestData['name'] ),
-            new Surnames( $requestData['surnames'] )
+            new Name( $data['name'] ),
+            new Surnames( $data['surnames'] )
         );
     }
 
@@ -138,7 +120,7 @@ final class CreateUserUseCase {
     /**
      * Hash user password
      *
-     * @param User $user
+     * @param  User   $user
      * @return void
      */
     private function hashUserPassword( User $user ) {
@@ -147,18 +129,18 @@ final class CreateUserUseCase {
             $user->getPassword()
         );
 
-        $user->setPassword($hashedPassword);
+        $user->setPassword( $hashedPassword );
     }
 
     /**
      * Dispatch event
      *
-     * @param User $user
+     * @param  User   $user
      * @return void
      */
     private function pullEvent( User $user ) {
-        foreach( $user->pullDomainEvents() as $event ) {
-            $this->eventDispatcher->dispatch($event, $event::NAME_EVENT);
+        foreach ( $user->pullDomainEvents() as $event ) {
+            $this->eventDispatcher->dispatch( $event, $event::NAME_EVENT );
         }
     }
 

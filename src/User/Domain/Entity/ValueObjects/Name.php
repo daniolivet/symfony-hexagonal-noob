@@ -1,21 +1,21 @@
 <?php
 
-namespace App\User\Application\DTO\ValueObjects;
+namespace App\User\Domain\Entity\ValueObjects;
 
-final class Surnames {
+final class Name {
 
     private string $value;
 
     /**
-     * @param string $surnames
+     * @param string $name
      */
-    public function __construct( string $surnames ) {
-        $this->value = $surnames;
+    public function __construct( string $name ) {
+        $this->value = $name;
     }
 
     /**
      * Get value of value object.
-     * 
+     *
      * @return string
      */
     public function getValue(): string {

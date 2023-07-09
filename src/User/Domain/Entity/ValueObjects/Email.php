@@ -1,9 +1,9 @@
 <?php
 
-namespace App\User\Application\DTO\ValueObjects;
+namespace App\User\Domain\Entity\ValueObjects;
 
 use App\User\Domain\Repository\IUserRepository;
-use App\User\Application\DTO\Exception\UserExists;
+use App\User\Domain\Exception\UserExists;
 
 final class Email {
 

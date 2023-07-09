@@ -2,12 +2,18 @@
 
 namespace App\User\Domain\Entity;
 
-use App\User\Application\Events\UserCreatedEvent;
-use App\User\Domain\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+
+use App\User\Application\Events\UserCreatedEvent;
+use Symfony\Contracts\EventDispatcher\Event;
+use App\User\Domain\Entity\ValueObjects\Password;
+use App\User\Domain\Entity\ValueObjects\Email;
+use App\User\Domain\Entity\ValueObjects\Name;
+use App\User\Domain\Entity\ValueObjects\Surnames;
+use App\User\Domain\Repository\UserRepository;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\Uid\UuidV4;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -39,18 +45,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     public function __construct(
-        string $uuid,
-        string $password,
-        string $email,
-        string $name,
-        string $surnames
+        UuidV4 $uuid,
+        Password $password,
+        Email $email,
+        Name $name,
+        Surnames $surnames
     )
     {
         $this->setUuid($uuid);
-        $this->setPassword($password);
-        $this->setEmail($email);
-        $this->setName($name);
-        $this->setSurnames($surnames);
+        $this->setPassword($password->getValue());
+        $this->setEmail($email->getValue());
+        $this->setName($name->getValue());
+        $this->setSurnames($surnames->getValue());
     }
 
     public function getUuid(): ?string
@@ -134,7 +140,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName( string $name): self
     {
         $this->name = $name;
 
@@ -181,11 +187,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param Surnames $surnames
      */
     public static function create(
-        string $uuid,
-        string $password,
-        string $email,
-        string $name,
-        string $surnames
+        UuidV4 $uuid,
+        Password $password,
+        Email $email,
+        Name $name,
+        Surnames $surnames
     ) {
         $user = new self(
             $uuid,
