@@ -3,12 +3,13 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0.33
+    container_name: database
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: Malaga1997//
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: noob_db
       MYSQL_USER: daniel.olivet
-      MYSQL_PASSWORD: Malaga1997//
+      MYSQL_PASSWORD: 1234
     ports:
       - 3307:3306
     volumes:
@@ -18,13 +19,14 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+    container_name: backend
     restart: always
     ports:
       - 8000:8000
     depends_on:
       - db
     volumes:
-      - .:/var/www/html
+      - ./backend/:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
