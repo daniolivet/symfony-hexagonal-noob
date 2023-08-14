@@ -31,11 +31,16 @@ class LoginUserController extends AbstractController
 
         $loginUser = ( $this->useCase )( $requestData );
 
-        return $this->json( [
+        $response = [
             'response' => $loginUser['response'],
-            'message'  => $loginUser['message'],
-            'token'    => $loginUser['token']
-        ], $loginUser['code']);
+            'message'  => $loginUser['message']
+        ];
+
+        if( isset($loginUser['token']) ) {
+            $response['token'] = $loginUser['token'];
+        }
+
+        return $this->json( $response, $loginUser['code']);
     }
 
     private function validateRequest( array $data ): array{

@@ -3,6 +3,7 @@
 namespace App\User\Infrastructure\Repository;
 
 use App\User\Domain\Entity\User;
+use App\User\Domain\Exception\UserDoesNotExist;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 use App\User\Domain\Repository\IUserRepository;
@@ -87,7 +88,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->addCriteria( $criteria );
 
         $queryResponse = $query->getQuery();
-        return $queryResponse->getOneOrNullResult();
+        $user          = $queryResponse->getOneOrNullResult();
+    
+        if( null === $user ) {
+            throw new UserDoesNotExist($email);
+        }
+
+        return $user;
     }
 
     /**

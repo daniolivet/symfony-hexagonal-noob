@@ -32,7 +32,7 @@ final class LoginUserUseCase
             $user = $this->findUser($requestData);
 
             $token = $this->jwtEncoder->encode([
-                'user_uuid' => $user->getUuid()
+                'uuid' => $user->getUuid()
             ]);
 
             return [
