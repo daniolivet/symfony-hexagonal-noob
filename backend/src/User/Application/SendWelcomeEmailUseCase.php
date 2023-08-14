@@ -15,6 +15,7 @@ final class SendWelcomeEmailUseCase {
 
     public function __invoke( UserCreatedEvent $event )
     {
+
         $email = (new Email())
             ->from('hello@example.com')
             ->to('you@example.com')
