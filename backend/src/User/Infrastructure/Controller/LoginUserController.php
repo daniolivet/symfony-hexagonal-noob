@@ -43,6 +43,14 @@ class LoginUserController extends AbstractController
         return $this->json( $response, $loginUser['code']);
     }
 
+    
+    /**
+     *
+     * Validate request data and return errors if exists.
+     *
+     * @param  array   $data
+     * @return array
+     */
     private function validateRequest( array $data ): array{
         $requestErrors = [];
 
