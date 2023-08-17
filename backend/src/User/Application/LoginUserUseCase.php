@@ -33,7 +33,7 @@ final class LoginUserUseCase
 
             $isPasswordValid = $this->passwordHasher->isPasswordValid( $user, $requestData['password'] );
             if( !$isPasswordValid ) {
-                throw new InvalidPasswordException();
+                throw new InvalidPasswordException('Invalid email or password.');
             }
 
             $token = $this->jwtEncoder->encode([
