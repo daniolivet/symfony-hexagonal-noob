@@ -11,3 +11,8 @@ user_login:
   path: /user/login
   controller: App\User\Infrastructure\Controller\LoginUserController
   methods: [ POST ]
+
+book_create:
+  path: /book/create
+  controller: App\Book\Infrastructure\Controller\CreateBookController
+  methods: [ POST ]
