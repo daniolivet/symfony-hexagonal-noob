@@ -2,6 +2,9 @@
 
 namespace App\User\Domain\Entity;
 
+use App\Book\Domain\Entity\Book;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\User\Application\Events\UserCreatedEvent;
@@ -15,34 +18,35 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\UuidV4;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: UserRepository::class) ]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     protected array $domainEvents = [];
 
-    #[ORM\Id]
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Id ]
+    #[ORM\Column(length: 180, unique: true) ]
     private string $uuid;
 
-    #[ORM\Column]
+    #[ORM\Column ]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
-    #[ORM\Column]
+    #[ORM\Column ]
     private ?string $password = null;
 
-    #[ORM\Column( unique: true )]
+    #[ORM\Column(unique: true) ]
     private string $email;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50) ]
     private string $name;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100) ]
     private string $surnames;
 
+    #[ORM\OneToMany(targetEntity: Book::class, mappedBy: 'user') ]
+    private Collection $books;
 
     public function __construct(
         UuidV4 $uuid,
@@ -50,13 +54,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         Email $email,
         Name $name,
         Surnames $surnames
-    )
-    {
-        $this->setUuid($uuid);
-        $this->setPassword($password->getValue());
-        $this->setEmail($email->getValue());
-        $this->setName($name->getValue());
-        $this->setSurnames($surnames->getValue());
+    ) {
+        $this->setUuid( $uuid );
+        $this->setPassword( $password->getValue() );
+        $this->setEmail( $email->getValue() );
+        $this->setName( $name->getValue() );
+        $this->setSurnames( $surnames->getValue() );
+
+        $this->books = new ArrayCollection();
     }
 
     public function getUuid(): ?string
@@ -64,11 +69,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): self
+    public function setUuid( string $uuid ): self
     {
         $this->uuid = $uuid;
 
         return $this;
+    }
+
+    /**
+     * 
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getBooks(): Collection
+    {
+        return $this->books;
     }
 
     /**
@@ -98,10 +112,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return array_unique( $roles );
     }
 
-    public function setRoles(array $roles): self
+    public function setRoles( array $roles ): self
     {
         $this->roles = $roles;
 
@@ -116,7 +130,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword( string $password ): self
     {
         $this->password = $password;
 
@@ -128,7 +142,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail( string $email ): self
     {
         $this->email = $email;
 
@@ -140,7 +154,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function setName( string $name): self
+    public function setName( string $name ): self
     {
         $this->name = $name;
 
@@ -152,7 +166,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->surnames;
     }
 
-    public function setSurnames(string $surnames): self
+    public function setSurnames( string $surnames ): self
     {
         $this->surnames = $surnames;
 
@@ -205,19 +219,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             new UserCreatedEvent(
                 $user->getEmail()
             )
-        ); 
+        );
 
         return $user;
     }
 
-    public function recordDomainEvent(Event $event): self
+    public function recordDomainEvent( Event $event ): self
     {
         $this->domainEvents[] = $event;
         return $this;
     }
     public function pullDomainEvents(): array
     {
-        $domainEvents = $this->domainEvents;
+        $domainEvents       = $this->domainEvents;
         $this->domainEvents = [];
         return $domainEvents;
     }
