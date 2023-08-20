@@ -45,8 +45,7 @@ final class LoginUserUseCase
             }
 
             $token = $this->jwtEncoder->encode( [ 
-                'uuid'     => $user->getUuid(),
-                'username' => $user->getEmail()
+                'email' => $user->getEmail()
             ] );
 
             return [ 
