@@ -14,7 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class CreateUserController extends AbstractController {
 
     /**
-     * @param CreateUserUseCase $useCase
+     * @param \App\User\Application\CreateUserUseCase $useCase
+     * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
      */
     public function __construct(
         private readonly CreateUserUseCase $useCase,
