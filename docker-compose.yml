@@ -29,6 +29,26 @@ services:
       - ./backend/:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - app-network
+
+  frontend:
+    image: node:18.14.1-alpine3.17
+    container_name: frontend
+    restart: always
+    ports:
+      - 9000:9000
+    depends_on:
+      - db
+    working_dir: /app
+    command: npm run dev
+    volumes:
+      - ./frontend/:/app
+    networks:
+      - app-network
+
+networks:
+  app-network:
 
 volumes:
   db_data:
