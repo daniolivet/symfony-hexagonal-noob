@@ -13,7 +13,7 @@ use App\User\Domain\Entity\ValueObjects\Password;
 use App\User\Domain\Entity\ValueObjects\Email;
 use App\User\Domain\Entity\ValueObjects\Name;
 use App\User\Domain\Entity\ValueObjects\Surnames;
-use App\User\Domain\Repository\UserRepository;
+use App\User\Infrastructure\Repository\UserRepository;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\UuidV4;

@@ -2,6 +2,7 @@
 
 namespace App\User\Application;
 
+use App\User\Domain\Exception\UserDoesNotExist;
 use App\User\Domain\Repository\IUserRepository;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +12,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class LoginUserUseCase
 {
-
+    /**
+     * @param \App\User\Domain\Repository\IUserRepository $repository
+     * @param \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordHasher
+     * @param \Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface $jwtEncoder
+     */
     public function __construct(
         private readonly IUserRepository $repository,
         private readonly UserPasswordHasherInterface $passwordHasher,
@@ -25,35 +30,38 @@ final class LoginUserUseCase
      * 
      * @return array
      */
-    public function __invoke(array $requestData): array
+    public function __invoke( array $requestData ): array
     {
         try {
 
             $user = $this->repository->findByEmail( $requestData['email'] );
-
-            $isPasswordValid = $this->passwordHasher->isPasswordValid( $user, $requestData['password'] );
-            if( !$isPasswordValid ) {
-                throw new InvalidPasswordException('Invalid email or password.');
+            if ( null === $user ) {
+                throw new UserDoesNotExist( $requestData['email'] );
             }
 
-            $token = $this->jwtEncoder->encode([
-                'uuid' => $user->getUuid()
-            ]);
+            $isPasswordValid = $this->passwordHasher->isPasswordValid( $user, $requestData['password'] );
+            if ( ! $isPasswordValid ) {
+                throw new InvalidPasswordException( 'Invalid email or password.' );
+            }
 
-            return [
+            $token = $this->jwtEncoder->encode( [ 
+                'email' => $user->getEmail()
+            ] );
+
+            return [ 
                 'response' => true,
                 'code'     => Response::HTTP_OK,
                 'message'  => 'User logged in succesfully!',
                 'token'    => $token
             ];
-        } catch (\RuntimeException $e) {
-            return [
+        } catch ( \RuntimeException $e ) {
+            return [ 
                 'response' => false,
                 'code'     => Response::HTTP_BAD_REQUEST,
                 'message'  => $e->getMessage(),
             ];
-        } catch (\Exception $e) {
-            return [
+        } catch ( \Exception $e ) {
+            return [ 
                 'response' => false,
                 'code'     => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'message'  => $e->getMessage(),

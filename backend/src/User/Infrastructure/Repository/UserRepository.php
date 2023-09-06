@@ -89,10 +89,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $queryResponse = $query->getQuery();
         $user          = $queryResponse->getOneOrNullResult();
-    
-        if( null === $user ) {
-            throw new UserDoesNotExist($email);
-        }
 
         return $user;
     }
